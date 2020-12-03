@@ -13,7 +13,7 @@ unsafe_characters = ['\n', '"']
 # Used to identify columns, currently hardcoded order
 header = ["video_id"] + snippet_features + ["trending_date", "tags", "view_count", "likes", "dislikes",
                                             "comment_count", "thumbnail_link", "comments_disabled",
-                                            "ratings_disabled", "description"]
+                                            "ratings_disabled", "description", "country_code"]
 
 
 def setup(api_path, code_path):
@@ -48,7 +48,7 @@ def get_tags(tags_list):
     return prepare_feature("|".join(tags_list))
 
 
-def get_videos(items):
+def get_videos(items, country_code):
     lines = []
     for video in items:
         comments_disabled = False
@@ -95,7 +95,7 @@ def get_videos(items):
         # Compiles all of the various bits of info into one consistently formatted line
         line = [video_id] + features + [prepare_feature(x) for x in [trending_date, tags, view_count, likes, dislikes,
                                                                        comment_count, thumbnail_link, comments_disabled,
-                                                                       ratings_disabled, description]]
+                                                                       ratings_disabled, description]] + [country_code]
         lines.append(",".join(line))
     return lines
 
@@ -116,7 +116,7 @@ def get_pages(country_code, next_page_token="&"):
 
         # Get all of the items as a list and let get_videos return the needed features
         items = video_data_page.get('items', [])
-        country_data += get_videos(items)
+        country_data += get_videos(items, country_code)
 
     return country_data
 
